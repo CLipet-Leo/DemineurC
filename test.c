@@ -38,7 +38,7 @@ void random_mine()
 }
 
 void afficherJeu() {
-    printf("   | 1  2  3  4  5  6  7  8  9  10\n");
+    printf("\n   | 1  2  3  4  5  6  7  8  9  10\n");
     printf("---|------------------------------\n");
     for (i = 0; i < 10; i++)
     {
@@ -54,11 +54,29 @@ void afficherJeu() {
     }
 }
 
+void afficherMine() {
+    printf("\n\n   | 1  2  3  4  5  6  7  8  9  10\n");
+    printf("---|------------------------------\n");
+    for (i = 0; i < 10; i++)
+    {
+        if (i < 9)
+            printf(" %d | ", i + 1);
+        else
+            printf("%d | ", i + 1);
+        for (j = 0; j < 10; j++)
+        {
+            printf("%c  ", MINE[i][j]);
+        }
+        printf("\n");
+    }
+}
+
 int main()
 {
     init();
     random_mine();
     afficherJeu();
+    afficherMine();
 
     return 0;
 }
