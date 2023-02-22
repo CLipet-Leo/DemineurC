@@ -1,24 +1,43 @@
-#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 char JEU[10][10];//grille de jeu 
-int i, j, b;//i les lignes, j les colonnes
+int i, j;//i les lignes, j les colonnes
+char MINE[10][10];//la grille avec les mines
+int nbMine;//le nombre de mine
 
-void random_bomb()
+void init()
 {
-    srand(time(NULL));
-    for (b = 0; b < 10; b++) {
-        int previ = rand() % 10;
-        int prevj = rand() % 10;
-        JEU[previ][prevj] = 'x';
-        //printf("x=%d et y=%d \n", previ, prevj);
+    for (i = 0; i < 10; i++)
+    {
+        for (j = 0; j < 10; j++)
+        {
+            JEU[i][j] = '-';//' 'implique case cachée
+            MINE[i][j] = '0';
+        }
     }
 }
 
-int main()
+void random_mine()
 {
+    srand(time(NULL));
+    int b;
+    nbMine = 20;
+    for (b = 0; b < nbMine; b++) {
+        i = rand() % 10;
+        j = rand() % 10;
+        if (MINE[i][j] == '0')//On vérifie que la case est libre
+        {
+            MINE[i][j] = 'X';//on place un M pour indiquer qu'il y a une mine
+        }
+        else {
+            nbMine++;
+        }
+    }
+}
+
+void afficherJeu() {
     printf("   | 1  2  3  4  5  6  7  8  9  10\n");
     printf("---|------------------------------\n");
     for (i = 0; i < 10; i++)
@@ -29,12 +48,17 @@ int main()
             printf("%d | ", i + 1);
         for (j = 0; j < 10; j++)
         {
-            JEU[i][j] = '*';
-            random_bomb();
             printf("%c  ", JEU[i][j]);
         }
         printf("\n");
     }
+}
+
+int main()
+{
+    init();
+    random_mine();
+    afficherJeu();
 
     return 0;
 }
