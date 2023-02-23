@@ -3,33 +3,34 @@
 #include <time.h>
 
 char JEU[10][10];//grille de jeu 
-int i, j;//i les lignes, j les colonnes
+int x, y;//x les lignes, y les colonnes
 char MINE[10][10];//la grille avec les mines
 int nbMine;//le nombre de mine
+int premier = 0;
 
-void init()
+void init()//fonction d'initialisation des grilles
 {
-    for (i = 0; i < 10; i++)
+    for (x = 0; x < 10; x++)
     {
-        for (j = 0; j < 10; j++)
+        for (y = 0; y < 10; y++)
         {
-            JEU[i][j] = '-';//' 'implique case cachée
-            MINE[i][j] = '0';
+            JEU[x][y] = '-';//affiche la grille de jeu avec des '-'
+            MINE[x][y] = '0';//définis la grille de mine avec des '0'
         }
     }
 }
 
-void random_mine()
+void random_mine()//fonction de placement aléatoire d'un nombre de mine définis
 {
     srand(time(NULL));
-    int b;
-    nbMine = 20;
-    for (b = 0; b < nbMine; b++) {
-        i = rand() % 10;
-        j = rand() % 10;
-        if (MINE[i][j] == '0')//On vérifie que la case est libre
+    int m;
+    nbMine = 20;//nombre de mine à placé sur la grille MINE
+    for (m = 0; m < nbMine; m++) {
+        x = rand() % 10;
+        y = rand() % 10;
+        if (MINE[x][y] == '0')//On vérifie que la case est libre
         {
-            MINE[i][j] = 'X';//on place un M pour indiquer qu'il y a une mine
+            MINE[x][y] = 'X';//on place un X pour indiquer qu'il y a une mine
         }
         else {
             nbMine++;
@@ -38,17 +39,17 @@ void random_mine()
 }
 
 void afficherJeu() {
-    printf("\n   | 1  2  3  4  5  6  7  8  9  10\n");
+    printf("\n\n   | 1  2  3  4  5  6  7  8  9  10\n");
     printf("---|------------------------------\n");
-    for (i = 0; i < 10; i++)
+    for (x = 0; x < 10; x++)
     {
-        if (i < 9)
-            printf(" %d | ", i + 1);
+        if (x < 9)
+            printf(" %d | ", x + 1);
         else
-            printf("%d | ", i + 1);
-        for (j = 0; j < 10; j++)
+            printf("%d | ", x + 1);
+        for (y = 0; y < 10; y++)
         {
-            printf("%c  ", JEU[i][j]);
+            printf("%c  ", JEU[x][y]);
         }
         printf("\n");
     }
@@ -57,26 +58,61 @@ void afficherJeu() {
 void afficherMine() {
     printf("\n\n   | 1  2  3  4  5  6  7  8  9  10\n");
     printf("---|------------------------------\n");
-    for (i = 0; i < 10; i++)
+    for (x = 0; x < 10; x++)
     {
-        if (i < 9)
-            printf(" %d | ", i + 1);
+        if (x < 9)
+            printf(" %d | ", x + 1);
         else
-            printf("%d | ", i + 1);
-        for (j = 0; j < 10; j++)
+            printf("%d | ", x + 1);
+        for (y = 0; y < 10; y++)
         {
-            printf("%c  ", MINE[i][j]);
+            printf("%c  ", MINE[x][y]);
         }
         printf("\n");
     }
 }
 
+int checkMine() {
+    return MINE[x - 1][y - 1] + MINE[x - 1][y] + MINE[x - 1][y + 1] + MINE[x][y - 1] + MINE[x][y + 1] + MINE[x + 1][y - 1] + MINE[x + 1][y] + MINE[x + 1][y + 1];
+}
+
+void play() {
+    int ligne;
+    int colonne;
+    while (premier == 0) {
+        printf("\nEntrez votre premiere case a jouer");
+        printf("\nla ligne : "); scanf_s("%d", &ligne);
+        printf("et la colonne : "); scanf_s("%d", &colonne);
+        printf("\nvous avez joue la case (%d,%d)", ligne, colonne);
+        ligne -= 1;
+        colonne -= 1;
+        if (JEU[x][y] <= JEU[ligne][colonne]) {
+            JEU[ligne][colonne] = '0';
+            premier++;
+        }
+        else {
+            printf("\nERREUR");
+            break;
+        }
+    }
+}
+
 int main()
 {
-    init();
-    random_mine();
+    printf("\n *****    ******   **       **   *****   **    *   ******   *     *   ******  ");
+    printf("\n *    *   *        * *     * *     *     * *   *   *        *     *   *     * ");
+    printf("\n *    *   *****    *  *   *  *     *     *  *  *   *****    *     *   ******* ");
+    printf("\n *    *   *        *   * *   *     *     *   * *   *        *     *   *    *  ");
+    printf("\n *****    ******   *    *    *   *****   *    **   ******    *****    *     * ");
+
+    init();//intialisation des grilles de jeu
     afficherJeu();
+    play();
+    afficherJeu();
+    random_mine();
+    checkMine();
     afficherMine();
+
 
     return 0;
 }
