@@ -10,8 +10,7 @@ int premier = 0;
 int ligne;
 int colonne;
 
-void init()//fonction d'initialisation des grilles
-{
+void init() { //fonction d'initialisation des grilles
     for (x = 0; x < 10; x++)
     {
         for (y = 0; y < 10; y++)
@@ -22,15 +21,14 @@ void init()//fonction d'initialisation des grilles
     }
 }
 
-void random_mine()//fonction de placement aléatoire d'un nombre de mine définis
-{
+void random_mine() {//fonction de placement aléatoire d'un nombre de mine définis
     srand(time(NULL));
     int m;
     nbMine = 10;//nombre de mine à placé sur la grille MINE
     for (m = 0; m < nbMine; m++) {
-        x = rand() % 10;
-        y = rand() % 10;
-        if (MINE[x][y] == 0 || MINE[x][y] != MINE[ligne][colonne])//On vérifie que la case est libre
+        x = rand() % nbMine;
+        y = rand() % nbMine;
+        if ((MINE[x][y] == 0) || (MINE[x][y] != MINE[ligne][colonne]))//On vérifie que la case est libre
         {
             MINE[x][y] = 1;//on place un 1 pour indiquer qu'il y a une mine
         }
@@ -82,12 +80,11 @@ void play() {
             printf("\nla ligne : "); scanf_s("%d", &ligne);
             printf("et la colonne : "); scanf_s("%d", &colonne);
             printf("\nvous avez selectionne la case (%d,%d)", ligne, colonne);
-            printf("\nQue voulez vous faire ? 1 : deminer ou 2 : marquer"); scanf_s("%d", &choix);
+            printf("\nQue voulez vous faire ? 1 deminer ou 2 marquer ou 3 rejouer : "); scanf_s("%d", &choix);
             ligne -= 1;
             colonne -= 1;
             if (JEU[ligne][colonne] > JEU[x][y]) {
-                if (choix == 1)
-                {
+                if (choix == 1) {
                     JEU[ligne][colonne] = '*';
                     break;
                 }
@@ -95,9 +92,25 @@ void play() {
                     JEU[ligne][colonne] = '$';
                     break;
                 }
+                else if (choix == 3) {
+                    printf("Vous rejouer");
+                }
                 else {
-                    printf("\nLe choix n'est pas correct");
-                    printf("\nQue voulez vous faire ? 1 : deminer ou 2 : marquer"); scanf_s("%d", &choix);
+                    while (choix < 1 || choix>3) {
+                        printf("\nLe choix n'est pas correct");
+                        printf("\nQue voulez vous faire ? 1 deminer ou 2 marquer ou 3 rejouer : "); scanf_s("%d", &choix);
+                    }
+                    if (choix == 1) {
+                        JEU[ligne][colonne] = '*';
+                        break;
+                    }
+                    else if (choix == 2) {
+                        JEU[ligne][colonne] = '$';
+                        break;
+                    }
+                    else if (choix == 3) {
+                        printf("Vous rejouer");
+                    }
                 }
             }
             else {
@@ -114,7 +127,7 @@ void play() {
             ligne -= 1;
             colonne -= 1;
             if (JEU[ligne][colonne] > JEU[x][y]) {
-                JEU[ligne][colonne] = '*';
+                JEU[ligne][colonne] = '0';
                 premier++;
             }
             else {
@@ -124,42 +137,48 @@ void play() {
     }
 }
 
-int checkMine(int x, int y) {
+int checkMine(int x, int y) {//Calcul du nb de mine dans un rayon de 3x3
     return MINE[x - 1][y - 1] + MINE[x - 1][y] + MINE[x - 1][y + 1] + MINE[x][y - 1] + MINE[x][y + 1] + MINE[x + 1][y - 1] + MINE[x + 1][y] + MINE[x + 1][y + 1];
 }
 
+
+
 int main()
 {
-    printf("\n *****    ******   **       **   *****   **    *   ******   *    *   *****  ");
-    printf("\n *    *   *        * *     * *     *     * *   *   *        *    *   *    * ");
-    printf("\n *    *   *****    *  *   *  *     *     *  *  *   *****    *    *   ****** ");
-    printf("\n *    *   *        *   * *   *     *     *   * *   *        *    *   *   *  ");
-    printf("\n *****    ******   *    *    *   *****   *    **   ******    ****    *    * ");
+    printf("\n -----    ------   --     --   -----   --    -   ------   -    -   -----  ");
+    printf("\n |    |   |        | |   | |     |     | |   |   |        |    |   |    | ");
+    printf("\n |    |   -----    | |   | |     |     |  |  |   -----    |    |   |----  ");
+    printf("\n |    |   |        |  | |  |     |     |   | |   |        |    |   |    | ");
+    printf("\n -----    ------   -   -   -   -----   -    --   ------    ----    -    - ");
 
-    int gagne = 0;
+    int fin = 0;
     init();//intialisation des grilles de jeu
     afficherJeu();
-    play();//au tour du joueur
+    play();//Premier tour du joueur
     random_mine();//place les mine après le premier coup du joueur
     afficherJeu();
-    while (gagne == 0) {
+    printf("\nIl y a %d mines autour de ta case", checkMine(ligne, colonne));//debug pour checkMine
+    afficherMine();//affiche la grille des mines pour le debug
+    while (fin == 0) {
         play();
         afficherJeu();
-        if (MINE[ligne][colonne] == 1 && JEU[ligne][colonne] != '$')
-        {
-            printf("PERDU, il y avait une mine à cet endroit, peut-etre la prochaine fois");
-            gagne++;
-        }
         printf("\n\nIl y a %d mines autour de ta case", checkMine(ligne, colonne));//debug pour checkMine
+        if (MINE[ligne][colonne] == 1 && JEU[ligne][colonne] != '$') {
+            printf("\n\nPERDU, il y avait une mine a cet endroit, peut-etre la prochaine fois");
+            fin++;
+        }
+        /*else if (true) {
+            printf("\n\nBRAVO !!!");
+            fin++;
+        }*/
         afficherMine();//affiche la grille des mines pour le debug
-
     }
 
-    printf("\n  ****     ****    **       **   ******       ****    *    *   ******   *****  ");
-    printf("\n *        *    *   * *     * *   *           *    *   *    *   *        *    * ");
-    printf("\n *  **    ******   *  *   *  *   *****       *    *   *    *   *****    ****** ");
-    printf("\n *    *   *    *   *   * *   *   *           *    *    *  *    *        *   *  ");
-    printf("\n  ****    *    *   *    *    *   ******       ****      **     ******   *    * ");
+    printf("\n  ----     ----    --     --   ------       ----    -    -   ------   -----  ");
+    printf("\n |        |    |   | |   | |   |           |    |   |    |   |        |    | ");
+    printf("\n |  --    |----|   | |   | |   -----       |    |   |    |   -----    |----  ");
+    printf("\n |    |   |    |   |  | |  |   |           |    |    |  |    |        |    | ");
+    printf("\n  ----    -    -   -   -   -   ------       ----      --     ------   -    - \n");
 
     return 0;
 }
