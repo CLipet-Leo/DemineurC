@@ -75,20 +75,51 @@ void afficherMine() {
 }
 
 void play() {
-    while (premier == 0) {
-        printf("\nEntrez votre premiere case a jouer");
-        printf("\nla ligne : "); scanf_s("%d", &ligne);
-        printf("et la colonne : "); scanf_s("%d", &colonne);
-        printf("\nvous avez joue la case (%d,%d)", ligne, colonne);
-        ligne -= 1;
-        colonne -= 1;
-        if (JEU[x][y] <= JEU[ligne][colonne]) {
-            JEU[ligne][colonne] = '*';
-            premier++;
+    int choix;
+    if (premier == 1) {
+        while (premier == 1) {
+            printf("\nQuelle case veut tu jouer ?");
+            printf("\nla ligne : "); scanf_s("%d", &ligne);
+            printf("et la colonne : "); scanf_s("%d", &colonne);
+            printf("\nvous avez selectionne la case (%d,%d)", ligne, colonne);
+            printf("\nQue voulez vous faire ? 1 : deminer ou 2 : marquer"); scanf_s("%d", &choix);
+            ligne -= 1;
+            colonne -= 1;
+            if (JEU[ligne][colonne] > JEU[x][y]) {
+                if (choix == 1)
+                {
+                    JEU[ligne][colonne] = '*';
+                    break;
+                }
+                else if (choix == 2) {
+                    JEU[ligne][colonne] = '$';
+                    break;
+                }
+                else {
+                    printf("\nLe choix n'est pas correct");
+                    printf("\nQue voulez vous faire ? 1 : deminer ou 2 : marquer"); scanf_s("%d", &choix);
+                }
+            }
+            else {
+                printf("\nErreur de placement, la case (%d,%d) n existe pas", ligne + 1, colonne + 1);
+            }
         }
-        else {
-            printf("\nERREUR");
-            break;
+    }
+    else {
+        while (premier == 0) {
+            printf("\nEntrez votre premiere case a jouer");
+            printf("\nla ligne : "); scanf_s("%d", &ligne);
+            printf("et la colonne : "); scanf_s("%d", &colonne);
+            printf("\nvous avez joue la case (%d,%d)", ligne, colonne);
+            ligne -= 1;
+            colonne -= 1;
+            if (JEU[ligne][colonne] > JEU[x][y]) {
+                JEU[ligne][colonne] = '*';
+                premier++;
+            }
+            else {
+                printf("\nErreur de placement, la case (%d,%d) n existe pas", ligne + 1, colonne + 1);
+            }
         }
     }
 }
@@ -99,20 +130,36 @@ int checkMine(int x, int y) {
 
 int main()
 {
-    printf("\n *****    ******   **       **   *****   **    *   ******   *     *   ******  ");
-    printf("\n *    *   *        * *     * *     *     * *   *   *        *     *   *     * ");
-    printf("\n *    *   *****    *  *   *  *     *     *  *  *   *****    *     *   ******* ");
-    printf("\n *    *   *        *   * *   *     *     *   * *   *        *     *   *    *  ");
-    printf("\n *****    ******   *    *    *   *****   *    **   ******    *****    *     * ");
+    printf("\n *****    ******   **       **   *****   **    *   ******   *    *   *****  ");
+    printf("\n *    *   *        * *     * *     *     * *   *   *        *    *   *    * ");
+    printf("\n *    *   *****    *  *   *  *     *     *  *  *   *****    *    *   ****** ");
+    printf("\n *    *   *        *   * *   *     *     *   * *   *        *    *   *   *  ");
+    printf("\n *****    ******   *    *    *   *****   *    **   ******    ****    *    * ");
 
+    int gagne = 0;
     init();//intialisation des grilles de jeu
     afficherJeu();
-    play();
-    random_mine();
+    play();//au tour du joueur
+    random_mine();//place les mine après le premier coup du joueur
     afficherJeu();
-    printf("\n\nIl y a %d mines autour de ta case", checkMine(ligne, colonne));
-    afficherMine();
+    while (gagne == 0) {
+        play();
+        afficherJeu();
+        if (MINE[ligne][colonne] == 1 && JEU[ligne][colonne] != '$')
+        {
+            printf("PERDU, il y avait une mine à cet endroit, peut-etre la prochaine fois");
+            gagne++;
+        }
+        printf("\n\nIl y a %d mines autour de ta case", checkMine(ligne, colonne));//debug pour checkMine
+        afficherMine();//affiche la grille des mines pour le debug
 
+    }
+
+    printf("\n  ****     ****    **       **   ******       ****    *    *   ******   *****  ");
+    printf("\n *        *    *   * *     * *   *           *    *   *    *   *        *    * ");
+    printf("\n *  **    ******   *  *   *  *   *****       *    *   *    *   *****    ****** ");
+    printf("\n *    *   *    *   *   * *   *   *           *    *    *  *    *        *   *  ");
+    printf("\n  ****    *    *   *    *    *   ******       ****      **     ******   *    * ");
 
     return 0;
 }
