@@ -80,22 +80,38 @@ void firstPlay() {
         printf("\nvous avez joue la case (%d,%d)", ligne, colonne);
         ligne -= 1;
         colonne -= 1;
-        if (JEU[ligne][colonne] > JEU[x][y]) {
+        if (JEU[ligne][colonne] >= JEU[x][y] && JEU[colonne][ligne] >= JEU[y][x]) {
             JEU[ligne][colonne] = '0';
             //safe zone
             MINE[ligne][colonne] = 2;//case selec
-            MINE[ligne - 1][colonne - 1] = 2;//haut gauche
-            MINE[ligne - 1][colonne] = 2;//haut
-            MINE[ligne - 1][colonne + 1] = 2;//haut droite
-            MINE[ligne][colonne - 1] = 2;//gauche
-            MINE[ligne][colonne + 1] = 2;//droite
-            MINE[ligne + 1][colonne - 1] = 2;//bas gauche
-            MINE[ligne + 1][colonne] = 2;//bas
-            MINE[ligne + 1][colonne + 1] = 2;//bas droite
+            if (MINE[ligne - 1][colonne - 1] == 0 && (ligne != 0) && (colonne != 0)) {//finito
+                MINE[ligne - 1][colonne - 1] = 2;//haut gauche
+            }
+            if (MINE[ligne - 1][colonne] == 0 && (ligne != 0)) {//finito
+                MINE[ligne - 1][colonne] = 2;//haut
+            }
+            if (MINE[ligne - 1][colonne + 1] == 0 && (ligne != 0) && (colonne != 9)) {//finito
+                MINE[ligne - 1][colonne + 1] = 2;//haut droite
+            }
+            if (MINE[ligne][colonne - 1] == 0 && (colonne != 0)) {//finito
+                MINE[ligne][colonne - 1] = 2;//gauche
+            }
+            if (MINE[ligne][colonne + 1] == 0 && (colonne != 9)) {//finito
+                MINE[ligne][colonne + 1] = 2;//droite
+            }
+            if ((MINE[ligne + 1][colonne - 1] == 0) && (ligne != 9) && (colonne != 0)) {//finito
+                MINE[ligne + 1][colonne - 1] = 2;//bas gauche
+            }
+            if (MINE[ligne + 1][colonne] == 0 && (ligne != 9)) {//finito
+                MINE[ligne + 1][colonne] = 2;//bas
+            }
+            if (MINE[ligne + 1][colonne + 1] == 0 && (ligne != 9) && (colonne != 9)) {//finito
+                MINE[ligne + 1][colonne + 1] = 2;//bas droite
+            }
             joue++;
         }
         else {
-            printf("\nErreur de placement, la case (%d,%d) n existe pas", ligne + 1, colonne + 1);
+            printf("\nErreur de placement, la case (%d,%d) n'existe pas", ligne + 1, colonne + 1);
         }
     }
 }
@@ -116,11 +132,10 @@ void play() {
         printf("\nQue voulez vous faire ? 1 deminer ou 2 marquer ou 3 rejouer : "); scanf_s("%d", &choix);
         ligne -= 1;
         colonne -= 1;
-        if (JEU[ligne][colonne] > JEU[x][y]) {
+        if (JEU[ligne][colonne] >= JEU[x][y] && JEU[colonne][ligne] >= JEU[y][x]) {
             if (choix == 1) {
-                //JEU[ligne][colonne] = '*';
                 if (checkMine(ligne, colonne) == 0) {
-                    JEU[ligne][colonne] = '0';
+                    JEU[ligne][colonne] = '0';//(char)checkMine
                 }
                 else if (checkMine(ligne, colonne) == 1) {
                     JEU[ligne][colonne] = '1';
@@ -161,7 +176,6 @@ void play() {
                     printf("\nQue voulez vous faire ? 1 deminer ou 2 marquer ou 3 rejouer : "); scanf_s("%d", &choix);
                 }
                 if (choix == 1) {
-                    //JEU[ligne][colonne] = '*';
                     if (checkMine(ligne, colonne) == 0) {
                         JEU[ligne][colonne] = '0';
                     }
