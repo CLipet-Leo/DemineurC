@@ -142,13 +142,34 @@ void firstPlay() {
 }
 
 int checkMine(int x, int y) {//Calcul du nb de mine dans un rayon de 3x3
-    return MINE[x - 1][y - 1] + MINE[x - 1][y] + MINE[x - 1][y + 1] + MINE[x][y - 1] + MINE[x][y + 1] + MINE[x + 1][y - 1] + MINE[x + 1][y] + MINE[x + 1][y + 1];
+    if (x == 0 && y == 0) {
+        return MINE[x][y + 1] + MINE[x + 1][y] + MINE[x + 1][y + 1];
+    }
+    else if (x == 9 && y == 9) {
+        return MINE[x - 1][y - 1] + MINE[x - 1][y] + MINE[x][y - 1];
+    }
+    else if (x == 0) {
+        return MINE[x][y - 1] + MINE[x][y + 1] + MINE[x + 1][y - 1] + MINE[x + 1][y] + MINE[x + 1][y + 1];
+    }
+    else if (y == 0) {
+        return MINE[x - 1][y] + MINE[x - 1][y + 1] + MINE[x][y + 1] + MINE[x + 1][y] + MINE[x + 1][y + 1];
+    }
+    else if (x == 9) {
+        return MINE[x - 1][y - 1] + MINE[x - 1][y] + MINE[x - 1][y + 1] + MINE[x][y - 1] + MINE[x][y + 1];
+    }
+    else if (y == 9) {
+        return MINE[x - 1][y - 1] + MINE[x - 1][y] + MINE[x - 1][y + 1] + MINE[x][y - 1] + MINE[x][y + 1];
+    }
+    else {
+        return MINE[x - 1][y - 1] + MINE[x - 1][y] + MINE[x - 1][y + 1] + MINE[x][y - 1] + MINE[x][y + 1] + MINE[x + 1][y - 1] + MINE[x + 1][y] + MINE[x + 1][y + 1];
+    }
 }
 
 void play() {
     int joue = 0;
     int choix;
-    char mine = (char)checkMine(ligne, colonne);
+    int imine;
+    char mine;
     while (joue == 0) {
         printf("\nQuelle case veut tu jouer ?");
         printf("\nla ligne : "); scanf_s("%d", &ligne);
@@ -159,8 +180,10 @@ void play() {
         colonne -= 1;
         if (JEU[ligne][colonne] >= JEU[x][y] && JEU[colonne][ligne] >= JEU[y][x]) {
             if (choix == 1) {
-                JEU[ligne][colonne] = '*';//a suppr apprès débug
-                //JEU[ligne][colonne] = mine;
+                imine = checkMine(ligne, colonne);
+                mine = '0' + imine;
+                //JEU[ligne][colonne] = '*';//a suppr apprès débug
+                JEU[ligne][colonne] = mine;
                 joue++;
             }
             else if (choix == 2) {
@@ -181,8 +204,10 @@ void play() {
                     printf("\nQue voulez vous faire ? 1 deminer ou 2 marquer ou 3 rejouer : "); scanf_s("%d", &choix);
                 }
                 if (choix == 1) {
-                    JEU[ligne][colonne] = '*';//a suppr apprès débug
-                    //JEU[ligne][colonne] = mine;
+                    imine = checkMine(ligne, colonne);
+                    mine = '0' + imine;
+                    //JEU[ligne][colonne] = '*';//a suppr apprès débug
+                    JEU[ligne][colonne] = mine;
                     joue++;
                 }
                 else if (choix == 2) {
@@ -233,10 +258,10 @@ int main()
             printf("\n\nPERDU, il y avait une mine a cet endroit, peut-etre la prochaine fois");
             fin++;
         }
-        /*else if ((MINE[x][y] == 1) == (JEU[x][y] == '-') || (MINE[x][y] == 1) == (JEU[x][y] == '$')) {
+        else if ((MINE[x][y] == 0) == (JEU[x][y] == (char)checkMine)) {
             printf("\n\nBRAVO !!!");
             fin++;
-        }*/
+        }
         afficherMine();//affiche la grille des mines pour le debug
     }
 
