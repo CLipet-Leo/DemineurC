@@ -2,19 +2,19 @@
 #include <stdlib.h>
 #include <time.h>
 
-char JEU[10][10];//grille de jeu 
 int x, y;//x les lignes, y les colonnes
-int MINE[10][10];//la grille avec les mines
 int ligne;
 int colonne;
 int maxDrapeau = 10;
 int drapeau = 0;
 int choix;
-int victoire = 0;
+int victoire = 90;
+int fin = 0;
+int okay = 9;
 
 void reveal(char JEU[10][10], int MINE[10][10], int x, int y);
 
-void init() { //fonction d'initialisation des grilles
+void init(char JEU[10][10], int MINE[10][10]) { //fonction d'initialisation des grilles
     for (x = 0; x < 10; x++)
     {
         for (y = 0; y < 10; y++)
@@ -25,7 +25,7 @@ void init() { //fonction d'initialisation des grilles
     }
 }
 
-void random_mine() {//fonction de placement aléatoire d'un nombre de mine définis
+void random_mine(int MINE[10][10]) {//fonction de placement aléatoire d'un nombre de mine définis
     srand(time(NULL));
     int m;
     int nbMine = 10;//nombre de mine à placé sur la grille MINE
@@ -68,7 +68,7 @@ void random_mine() {//fonction de placement aléatoire d'un nombre de mine défini
     }
 }
 
-void afficherJeu() {
+void afficherJeu(char JEU[10][10]) {
     printf("\n\n   | 1  2  3  4  5  6  7  8  9  10\n");
     printf("---|------------------------------\n");
     for (x = 0; x < 10; x++)
@@ -85,7 +85,7 @@ void afficherJeu() {
     }
 }
 
-void afficherMine() {
+void afficherMine(int MINE[10][10]) {
     printf("\n\n   | 1  2  3  4  5  6  7  8  9  10\n");
     printf("---|------------------------------\n");
     for (x = 0; x < 10; x++)
@@ -102,7 +102,7 @@ void afficherMine() {
     }
 }
 
-void firstPlay() {
+void firstPlay(char JEU[10][10], int MINE[10][10]) {
     int joue = 0;
     while (joue == 0) {
         printf("\nEntrez votre premiere case a jouer");
@@ -145,11 +145,11 @@ void firstPlay() {
             printf("\nErreur de placement, la case (%d,%d) n'existe pas", ligne + 1, colonne + 1);
         }
     }
-    random_mine();
+    random_mine(MINE);
     reveal(JEU, MINE, ligne, colonne);
 }
 
-int checkMine(int x, int y) {//Calcul du nb de mine dans un rayon de 3x3
+int checkMine(char JEU[10][10], int MINE[10][10], int x, int y) {//Calcul du nb de mine dans un rayon de 3x3
     if (x == 0 && y == 0) {
         return MINE[x][y + 1] + MINE[x + 1][y] + MINE[x + 1][y + 1];
     }
@@ -179,10 +179,8 @@ int checkMine(int x, int y) {//Calcul du nb de mine dans un rayon de 3x3
     }
 }
 
-void play() {
+void play(char JEU[10][10], int MINE[10][10]) {
     int joue = 0;
-    int imine;
-    char mine;
     while (joue == 0) {
         printf("\nQuelle case veut tu jouer ?");
         printf("\nla ligne : "); scanf_s("%d", &ligne);
@@ -202,7 +200,10 @@ void play() {
                 joue++;
             }
             else if (choix == 2) {
-                if (JEU[ligne][colonne] == '-') {
+                if (maxDrapeau == 0) {
+                    printf("Tu n'as plus de drapeau en stock");
+                }
+                else if (JEU[ligne][colonne] == '-') {
                     JEU[ligne][colonne] = '$';
                     maxDrapeau -= 1;
                     if ((MINE[ligne][colonne] == 1) == (JEU[ligne][colonne] == '$')) {
@@ -239,7 +240,10 @@ void play() {
                     joue++;
                 }
                 else if (choix == 2) {
-                    if (JEU[ligne][colonne] == '-') {
+                    if (maxDrapeau == 0) {
+                        printf("Tu n'as plus de drapeau en stock");
+                    }
+                    else if (JEU[ligne][colonne] == '-') {
                         JEU[ligne][colonne] = '$';
                         maxDrapeau -= 1;
                         if ((MINE[ligne][colonne] == 1) == (JEU[ligne][colonne] == '$')) {
@@ -270,7 +274,7 @@ void play() {
 }
 
 void reveal(char JEU[10][10], int MINE[10][10], int x, int y) {
-    int nbMine = checkMine(x, y);
+    int nbMine = checkMine(JEU, MINE, x, y);
     char mine = '0' + nbMine;
     //si x et y ne dépassent pas les bords
     if (!((x >= 0 && y >= 0) && (x < 10 && y < 10)))
@@ -280,7 +284,7 @@ void reveal(char JEU[10][10], int MINE[10][10], int x, int y) {
         return;
 
     JEU[x][y] = mine;
-    victoire++;
+    victoire -= 1;
 
     if (nbMine != 0)
         return;
@@ -302,38 +306,35 @@ void reveal(char JEU[10][10], int MINE[10][10], int x, int y) {
 
 int main()
 {
-
     printf("\n -----    ------   --     --   -----   --    -   ------   -    -   -----  ");
     printf("\n |    |   |        | |   | |     |     | |   |   |        |    |   |    | ");
     printf("\n |    |   -----    | |   | |     |     |  |  |   -----    |    |   |----  ");
     printf("\n |    |   |        |  | |  |     |     |   | |   |        |    |   |    | ");
     printf("\n -----    ------   -   -   -   -----   -    --   ------    ----    -    - ");
 
-    int fin = 0;
-    int okay = 9;
-    init();//intialisation des grilles de jeu
-    afficherJeu();
-    firstPlay();//Premier tour du joueur
-    //random_mine();//place les mine après le premier coup du joueur
-    //reveal(JEU, MINE, ligne, colonne);
-    afficherJeu();
-    afficherMine();//affiche la grille des mines pour le debug
-    printf("\ntu est a %d cases de la victoire", victoire);
-    int imine = checkMine(x, y);
+    char JEU[10][10];
+    int MINE[10][10];
+
+    init(JEU, MINE);//intialisation des grilles de jeu
+    afficherJeu(JEU);
+    firstPlay(JEU, MINE);//Premier tour du joueur
+    afficherJeu(JEU);
+    //afficherMine(MINE);//affiche la grille des mines pour le debug
+    int imine = checkMine(JEU, MINE, x, y);
     char mine = '0' + imine;
     while (fin == 0) {
-        play();
-        afficherJeu();
-        printf("\ntu est a %d cases de la victoire", victoire);
+        play(JEU, MINE);
+        afficherJeu(JEU);
+        printf("\n\nIl te reste %d drapeau a placer", maxDrapeau);
         if (MINE[ligne][colonne] == 1 && JEU[ligne][colonne] != '$' && choix != 2) {
-            printf("\n\nPERDU, il y avait une mine a cet endroit, peut-etre la prochaine fois");
+            printf("\n\nPERDU, il y avait une mine a cet endroit, peut-etre la prochaine fois\n");
             fin++;
         }
-        else if (victoire == 90 || drapeau == 10) {
-            printf("\n\nBRAVO !!!");
+        else if (victoire == 0 || drapeau == 10) {
+            printf("\n\nBRAVO !!!\n");
             fin++;
         }
-        afficherMine();//affiche la grille des mines pour le debug
+        //afficherMine(MINE);//affiche la grille des mines pour le debug
     }
 
     printf("\n  ----     ----    --     --   ------       ----    -    -   ------   -----  ");
