@@ -7,8 +7,12 @@ int x, y;//x les lignes, y les colonnes
 int MINE[10][10];//la grille avec les mines
 int ligne;
 int colonne;
+int maxDrapeau = 10;
 int drapeau = 0;
 int choix;
+int victoire = 0;
+
+void reveal(char JEU[10][10], int MINE[10][10], int x, int y);
 
 void init() { //fonction d'initialisation des grilles
     for (x = 0; x < 10; x++)
@@ -108,7 +112,7 @@ void firstPlay() {
         ligne -= 1;
         colonne -= 1;
         if (JEU[ligne][colonne] >= JEU[x][y] && JEU[colonne][ligne] >= JEU[y][x]) {
-            JEU[ligne][colonne] = '0';
+            //JEU[ligne][colonne] = '0';
             /*safe zone temporaire*/
             MINE[ligne][colonne] = 2;//case selec
             if (MINE[ligne - 1][colonne - 1] == 0 && (ligne != 0) && (colonne != 0)) {
@@ -141,28 +145,36 @@ void firstPlay() {
             printf("\nErreur de placement, la case (%d,%d) n'existe pas", ligne + 1, colonne + 1);
         }
     }
+    random_mine();
+    reveal(JEU, MINE, ligne, colonne);
 }
 
 int checkMine(int x, int y) {//Calcul du nb de mine dans un rayon de 3x3
     if (x == 0 && y == 0) {
         return MINE[x][y + 1] + MINE[x + 1][y] + MINE[x + 1][y + 1];
     }
+    else if (x == 0 && y == 9) {
+        return MINE[x][y - 1] + MINE[x + 1][y + 1] + MINE[x][y + 1];
+    }
+    else if (x == 9 && y == 0) {
+        return MINE[x - 1][y] + MINE[x - 1][y + 1] + MINE[x][y + 1];
+    }
     else if (x == 9 && y == 9) {
         return MINE[x - 1][y - 1] + MINE[x - 1][y] + MINE[x][y - 1];
     }
-    else if (x == 0) {
+    else if (x == 0 && y > 0) {
         return MINE[x][y - 1] + MINE[x][y + 1] + MINE[x + 1][y - 1] + MINE[x + 1][y] + MINE[x + 1][y + 1];
     }
-    else if (y == 0) {
+    else if (x > 0 && y == 0) {
         return MINE[x - 1][y] + MINE[x - 1][y + 1] + MINE[x][y + 1] + MINE[x + 1][y] + MINE[x + 1][y + 1];
     }
-    else if (x == 9) {
+    else if (x == 9 && y > 0) {
         return MINE[x - 1][y - 1] + MINE[x - 1][y] + MINE[x - 1][y + 1] + MINE[x][y - 1] + MINE[x][y + 1];
     }
-    else if (y == 9) {
-        return MINE[x - 1][y - 1] + MINE[x - 1][y] + MINE[x - 1][y + 1] + MINE[x][y - 1] + MINE[x][y + 1];
+    else if (y == 9 && x > 0) {
+        return MINE[x - 1][y - 1] + MINE[x - 1][y] + MINE[x][y - 1] + MINE[x + 1][y - 1] + MINE[x + 1][y];
     }
-    else {
+    else if ((x > 0 && y > 0) && (x < 9 && y < 9)) {
         return MINE[x - 1][y - 1] + MINE[x - 1][y] + MINE[x - 1][y + 1] + MINE[x][y - 1] + MINE[x][y + 1] + MINE[x + 1][y - 1] + MINE[x + 1][y] + MINE[x + 1][y + 1];
     }
 }
@@ -182,9 +194,7 @@ void play() {
         if (JEU[ligne][colonne] >= JEU[x][y] && JEU[colonne][ligne] >= JEU[y][x]) {
             if (choix == 1) {
                 if (JEU[ligne][colonne] == '-') {
-                    imine = checkMine(ligne, colonne);
-                    mine = '0' + imine;
-                    JEU[ligne][colonne] = mine;
+                    reveal(JEU, MINE, ligne, colonne);
                 }
                 else if (JEU[ligne][colonne] != '-') {
                     printf("\nCette case est deja joue ou marque");
@@ -194,6 +204,7 @@ void play() {
             else if (choix == 2) {
                 if (JEU[ligne][colonne] == '-') {
                     JEU[ligne][colonne] = '$';
+                    maxDrapeau -= 1;
                     if ((MINE[ligne][colonne] == 1) == (JEU[ligne][colonne] == '$')) {
                         drapeau++;
                     }
@@ -202,6 +213,7 @@ void play() {
                     if ((MINE[ligne][colonne] == 1) == (JEU[ligne][colonne] == '$')) {
                         drapeau -= 1;
                     }
+                    maxDrapeau++;
                     JEU[ligne][colonne] = '-';
                 }
                 else {
@@ -219,9 +231,7 @@ void play() {
                 }
                 if (choix == 1) {
                     if (JEU[ligne][colonne] == '-') {
-                        imine = checkMine(ligne, colonne);
-                        mine = '0' + imine;
-                        JEU[ligne][colonne] = mine;
+                        reveal(JEU, MINE, ligne, colonne);
                     }
                     else if (JEU[ligne][colonne] != '-') {
                         printf("\nCette case est deja joue ou marque");
@@ -231,6 +241,7 @@ void play() {
                 else if (choix == 2) {
                     if (JEU[ligne][colonne] == '-') {
                         JEU[ligne][colonne] = '$';
+                        maxDrapeau -= 1;
                         if ((MINE[ligne][colonne] == 1) == (JEU[ligne][colonne] == '$')) {
                             drapeau++;
                         }
@@ -239,6 +250,7 @@ void play() {
                         if ((MINE[ligne][colonne] == 1) == (JEU[ligne][colonne] == '$')) {
                             drapeau -= 1;
                         }
+                        maxDrapeau++;
                         JEU[ligne][colonne] = '-';
                     }
                     else {
@@ -257,10 +269,40 @@ void play() {
     }
 }
 
+void reveal(char JEU[10][10], int MINE[10][10], int x, int y) {
+    int nbMine = checkMine(x, y);
+    char mine = '0' + nbMine;
+    //si x et y ne dépassent pas les bords
+    if (!((x >= 0 && y >= 0) && (x < 10 && y < 10)))
+        return;
+
+    if (JEU[x][y] != '-')
+        return;
+
+    JEU[x][y] = mine;
+    victoire++;
+
+    if (nbMine != 0)
+        return;
+
+    JEU[x][y] = mine;
+
+    reveal(JEU, MINE, x - 1, y - 1);//haut gauche
+    reveal(JEU, MINE, x - 1, y);//haut
+    reveal(JEU, MINE, x - 1, y + 1);//haut droite
+    reveal(JEU, MINE, x, y - 1);//gauche
+    reveal(JEU, MINE, x, y + 1);//droite
+    reveal(JEU, MINE, x + 1, y - 1);//bas gauche
+    reveal(JEU, MINE, x + 1, y);//bas
+    reveal(JEU, MINE, x + 1, y + 1);//bas droite
+
+}
+
 
 
 int main()
 {
+
     printf("\n -----    ------   --     --   -----   --    -   ------   -    -   -----  ");
     printf("\n |    |   |        | |   | |     |     | |   |   |        |    |   |    | ");
     printf("\n |    |   -----    | |   | |     |     |  |  |   -----    |    |   |----  ");
@@ -272,20 +314,22 @@ int main()
     init();//intialisation des grilles de jeu
     afficherJeu();
     firstPlay();//Premier tour du joueur
-    random_mine();//place les mine après le premier coup du joueur
+    //random_mine();//place les mine après le premier coup du joueur
+    //reveal(JEU, MINE, ligne, colonne);
     afficherJeu();
     afficherMine();//affiche la grille des mines pour le debug
+    printf("\ntu est a %d cases de la victoire", victoire);
     int imine = checkMine(x, y);
     char mine = '0' + imine;
     while (fin == 0) {
         play();
-        //repeter checkMine jusqu'à plus de 0
         afficherJeu();
+        printf("\ntu est a %d cases de la victoire", victoire);
         if (MINE[ligne][colonne] == 1 && JEU[ligne][colonne] != '$' && choix != 2) {
             printf("\n\nPERDU, il y avait une mine a cet endroit, peut-etre la prochaine fois");
             fin++;
         }
-        else if ((MINE[x][y] == 0) == (JEU[x][y] == mine) || drapeau == 10) {
+        else if (victoire == 90 || drapeau == 10) {
             printf("\n\nBRAVO !!!");
             fin++;
         }
