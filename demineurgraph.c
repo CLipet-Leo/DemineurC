@@ -78,7 +78,13 @@ int main(int argc, char* argv[]) {
     {
         for (y = 0; y < 10; y++)
         {
-            JEU[x][y] = texture;//affiche la grille de jeu avec des textures
+            //affiche la grille de jeu avec des textures
+            if (JEU[x - 1][y] == stock[0] || (y != 0 && JEU[x][y - 1] == stock[0])) {
+                JEU[x][y] = stock[1];
+            }
+            else {
+                JEU[x][y] = stock[0];
+            }
             MINE[x][y] = 0;//définis la grille de mine avec des 0
         }
     }
